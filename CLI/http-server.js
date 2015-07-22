@@ -4,6 +4,40 @@ var argv = require("minimist")(process.argv.slice(2));
 var colors = require("colors");
 var http = require("http");
 var nodeStatic = require("node-static");
+var connect = require("connect");
+var serveStatic = require('serve-static');
+
+//Silent loging if -s
+var log = (argv.s && argv.silent) ? (function() {}) : console.log;
+
+
+var port = process.env.PORT;
+var root = argv._[0] || ".";
+var file = new(nodeStatic.Server)(root,{AutoIndex: "true", cache: 3600});
+
+//Setup connect as middleware
+var app = connect();
+
+app.use(serveStatic(root));
+
+//Create Server
+log("Starting static web server for ".yellow + root.cyan + " on port ".yellow + port.toString().cyan + ".");
+http.createServer(app).listen(process.env.PORT, process.env.IP);
+
+
+
+
+
+
+
+
+
+
+//Exit server on Ctrl + C
+process.on('SIGINT', function(){
+    log("\nStatic web server stopped.".red);
+    process.exit();
+});
 
 //Print help on -h or --help
 if(argv.h || argv.help){
@@ -15,24 +49,5 @@ if(argv.h || argv.help){
     
     console.log(help);
 }
-
-//Silent loging if -s
-var log = (argv.s && argv.silent) ? (function() {}) : console.log;
-
-//Start server and render files
-var port = process.env.PORT;
-var root = argv._[0] || ".";
-var file = new(nodeStatic.Server)(root,{AutoIndex: true, cache: 3600});
-log("Starting static seb server for ".yellow + root.cyan + " on port ".yellow + port.toString().cyan + ".");
-http.createServer(function(request, response){
-    file.serve(request, response);
-}).listen(process.env.PORT, process.env.IP);
-
-//Exit server on Ctrl + C
-process.on('SIGINT', function(){
-    log("\nStatic web server stopped.".red);
-    process.exit();
-});
-
 
 
