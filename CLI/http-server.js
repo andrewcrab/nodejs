@@ -6,6 +6,7 @@ var http = require("http");
 var nodeStatic = require("node-static");
 var connect = require("connect");
 var serveStatic = require('serve-static');
+var serveIndex = require("serve-index");
 
 //Silent loging if -s
 var log = (argv.s && argv.silent) ? (function() {}) : console.log;
@@ -19,6 +20,7 @@ var file = new(nodeStatic.Server)(root,{AutoIndex: "true", cache: 3600});
 var app = connect();
 
 app.use(serveStatic(root));
+app.use(serveIndex(root))
 
 //Create Server
 log("Starting static web server for ".yellow + root.cyan + " on port ".yellow + port.toString().cyan + ".");
